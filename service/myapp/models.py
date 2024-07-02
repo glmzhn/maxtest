@@ -12,7 +12,7 @@ class Query(models.Model):
 
 
 class ExternalServerResponse(models.Model):
-    query = models.OneToOneField(Query, on_delete=models.CASCADE)
+    query = models.OneToOneField(Query, on_delete=models.CASCADE, null=False, default=None)
     result = models.BooleanField()
 
     def __str__(self):
