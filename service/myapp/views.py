@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.urls import reverse
 from django.conf import settings
-from .models import Query
+from .models import Query, ExternalServerResponse
 from .serializers import QuerySerializer
 
 
@@ -25,6 +25,7 @@ class QueryDetailView(CreateAPIView):
                                  json={"query_id": query_instance.id})
         if response.status_code == 200:
             result = response.json().get("result")
+            ExternalServerResponse.objects.create(query=query_instance, result=result)
             return Response({"result": result}, status=status.HTTP_201_CREATED, headers=headers)
         else:
             return Response({"error": "Failed to get response from external server"},
