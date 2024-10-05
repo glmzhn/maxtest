@@ -7,7 +7,8 @@ from rest_framework.views import APIView
 from django.urls import reverse
 from django.conf import settings
 from .models import Query, ExternalServerResponse
-from .serializers import QuerySerializer
+from .serializers import QuerySerializer, ExternalServerSerializer
+from drf_spectacular.utils import extend_schema
 
 
 class QueryDetailView(CreateAPIView):
@@ -36,6 +37,10 @@ class QueryHistoryView(ListAPIView):
     queryset = Query.objects.all()
     serializer_class = QuerySerializer
 
+    @extend_schema(operation_id="api_v1_history_list")
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 
 class QueryDetailByNumberView(ListAPIView):
     serializer_class = QuerySerializer
@@ -44,15 +49,22 @@ class QueryDetailByNumberView(ListAPIView):
         number = self.kwargs['number']
         return Query.objects.filter(number=number)
 
+    @extend_schema(operation_id="api_v1_history_detail_by_number")
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
 
 class ServerResponseView(APIView):
-    def post(self, request, *args, **kwargs):
+    serializer_class = ExternalServerSerializer
+
+    @staticmethod
+    def post(request, *args, **kwargs):
         query_id = request.data.get('query_id')
         if not query_id:
             return Response({'error': 'query_id is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            query = Query.objects.get(id=query_id)
+            Query.objects.get(id=query_id)
         except Query.DoesNotExist:
             return Response({'error': 'Query not found'}, status=status.HTTP_404_NOT_FOUND)
 

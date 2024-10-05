@@ -1,0 +1,151 @@
+openapi: 3.0.3
+info:
+  title: WebApp API
+  version: 0.0.0
+paths:
+  /api/v1/history/:
+    get:
+      operationId: api_v1_history_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Query'
+          description: ''
+  /api/v1/history/{number}/:
+    get:
+      operationId: api_v1_history_detail_by_number
+      parameters:
+      - in: path
+        name: number
+        schema:
+          type: string
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Query'
+          description: ''
+  /api/v1/query/:
+    post:
+      operationId: api_v1_query_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Query'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Query'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Query'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+          description: ''
+  /api/v1/result/:
+    post:
+      operationId: api_v1_result_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalServer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExternalServer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExternalServer'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalServer'
+          description: ''
+components:
+  schemas:
+    ExternalServer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        result:
+          type: boolean
+        query:
+          type: integer
+      required:
+      - id
+      - result
+    Query:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: string
+          maxLength: 50
+        latitude:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        longitude:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
